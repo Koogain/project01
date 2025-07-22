@@ -1,0 +1,2 @@
+subjectCODE: 0001 / subjectNAME: 행복하게 간식먹는 법 / professorNAME: 행복이 / subjectCATE: 전공 / WEEK: 수요일 / TIME: 09 : 00 ~ 11 : 00
+subjectCODE: 0002 / subjectNAME: 하늘 보는 법 / professorNAME: 곰곰 / subjectCATE: 교양 / WEEK: 금요일 / TIME: 13 : 00 ~ 14 : 00
