@@ -1,1 +1,2 @@
-userID: cloud0527 / friendNAME: 최하늘 / friendID: sky0527 / friendPIN: 1
+userID: cloud0527 / friendNAME: skyKOO / friendID: sky0527 / friendPIN: 1
+userID: sky0527 / friendNAME: cloudCHOI / friendID: cloud0527 / friendPIN: 0
