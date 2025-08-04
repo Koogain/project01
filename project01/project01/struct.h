@@ -17,7 +17,7 @@ typedef struct
 
 typedef struct
 {
-	char subjectID[20]; // 과목 코드
+	char subjectCode[20]; // 과목 코드
 	char subjectName[20]; // 과목명
 	char subCategory[20]; // 과목 카테고리
 	char professorName[20]; // 교수님 성함

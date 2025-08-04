@@ -1,11 +1,14 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 
 #include <windows.h>
+#include <time.h>
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
 #include <stdbool.h>
 #include "struct.h"
+
+HANDLE hConsole;
 
 // 전처리 변수
 #define BTN_WIDTH 20
@@ -44,6 +47,8 @@ void drawInputBox(int x, int y, int width);
 void getTextInput(int x, int y, char* buffer, int maxLen);
 void waitForSignupClick(char* name, char* id, char* pw);
 
+void handleTimetableScreen(const char* userID);
+
 void handleMainMenuScreen(const char* userID, const char* userName);
 void handleFriendsListScreen(const char* userID, const char* userName);
 void handleAddFriendScreen(const char* userID);
@@ -53,10 +58,10 @@ bool isInside(int x, int y, int left, int top, int right, int bottom);
 // 메인함수
 int main(void)
 {
-    system("MODE CON:COLS=90 LINES=40");
+    system("MODE CON:COLS=100 LINES=50");
     system("cls");
 
-    drawMainFrame(5, 1, 80, 35);      // 전체 틀
+    drawMainFrame(4, 1, 92, 47);      // 전체 틀
     drawIDButton(25, 6);             // 로그인 버튼
     drawPWInputBox(25, 12);         // 비밀번호 입력
     drawLoginButton(27, 20);  // [ 로그인 버튼 ]
@@ -92,6 +97,21 @@ void trimAll(char* str)
         q++;
     }
     *p = '\0';
+}
+
+void setColor(int color) 
+{
+    SetConsoleTextAttribute(hConsole, color);
+}
+
+int getRandomColor() 
+{
+    int color;
+    do 
+    {
+        color = 1 + rand() % 15;
+    } while (color == 7);
+    return color;
 }
 
 // 기능 함수
@@ -228,7 +248,7 @@ void listenForClick()
     INPUT_RECORD record;
     DWORD events;
 
-    while (1) 
+    while (1)
     {
         ReadConsoleInput(hInput, &record, 1, &events);
 
@@ -242,30 +262,30 @@ void listenForClick()
                 int clickY = mouse.dwMousePosition.Y;
 
                 // [회원가입]
-                if (isInside(clickX, clickY, 45, 20, 45 + strlen("[ 회원가입 ]") - 1, 20)) 
+                if (isInside(clickX, clickY, 45, 20, 45 + strlen("[ 회원가입 ]") - 1, 20))
                 {
                     handleSignupScreen();
                     break;
                 }
 
                 // [로그인]
-                else if (isInside(clickX, clickY, 27, 20, 37, 20)) 
+                else if (isInside(clickX, clickY, 27, 20, 37, 20))
                 {
-                    handleLogin(globalID, globalPW); 
+                    handleLogin(globalID, globalPW);
                 }
 
                 // ID 입력 박스
-                else if (isInside(clickX, clickY, 26, 8, 60, 8)) 
+                else if (isInside(clickX, clickY, 26, 8, 60, 8))
                 {
                     gotoxy(26, 8);
-                    getTextInput(26, 8, globalID, 49);  
+                    getTextInput(26, 8, globalID, 49);
                 }
 
                 // PW 입력 박스
-                else if (isInside(clickX, clickY, 26, 14, 60, 14)) 
+                else if (isInside(clickX, clickY, 26, 14, 60, 14))
                 {
                     gotoxy(26, 14);
-                    getTextInput(26, 14, globalPW, 49);  
+                    getTextInput(26, 14, globalPW, 49);
                 }
             }
         }
@@ -316,7 +336,7 @@ void handleSignupScreen()
 
     Member user;  // 구조체 사용
 
-    drawMainFrame(5, 1, 80, 35);
+    drawMainFrame(5, 1, 85, 38);
 
     gotoxy(32, 4);  printf("===== 회원가입 창 =====");
 
@@ -459,42 +479,42 @@ void waitForSignupClick(char* name, char* id, char* pw)
     INPUT_RECORD inputRecord;
     DWORD events;
 
-    while (1) 
+    while (1)
     {
         ReadConsoleInput(hInput, &inputRecord, 1, &events);
 
-        if (inputRecord.EventType == MOUSE_EVENT) 
+        if (inputRecord.EventType == MOUSE_EVENT)
         {
             MOUSE_EVENT_RECORD m = inputRecord.Event.MouseEvent;
 
-            if (m.dwEventFlags == 0 && (m.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED)) 
+            if (m.dwEventFlags == 0 && (m.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED))
             {
                 int x = m.dwMousePosition.X;
                 int y = m.dwMousePosition.Y;
 
                 // 이름 박스
-                if (x >= 30 && x <= 59 && y == 8) 
+                if (x >= 30 && x <= 59 && y == 8)
                 {
                     gotoxy(31, 8);
                     getTextInput(31, 8, name, false);
                 }
 
                 // 아이디 박스
-                else if (x >= 30 && x <= 59 && y == 11) 
+                else if (x >= 30 && x <= 59 && y == 11)
                 {
                     gotoxy(31, 11);
                     getTextInput(31, 11, id, false);
                 }
 
                 // 비밀번호 박스
-                else if (x >= 30 && x <= 59 && y == 14) 
+                else if (x >= 30 && x <= 59 && y == 14)
                 {
                     gotoxy(31, 14);
                     getTextInput(31, 14, pw, true);
                 }
 
                 // [확인]을 클릭했다고 가정하는 y좌표 처리 (예시)
-                else if (x >= 20 && x <= 35 && y == 17) 
+                else if (x >= 20 && x <= 35 && y == 17)
                 {
                     break;  // 입력 완료
                 }
@@ -503,12 +523,13 @@ void waitForSignupClick(char* name, char* id, char* pw)
     }
 }
 
+
 //
 void handleMainMenuScreen(const char* userID, const char* userName)
 {
     system("cls");
 
-    drawMainFrame(5, 1, 80, 35);
+    drawMainFrame(4, 1, 92, 47);
     gotoxy(32, 4);
     printf("===== 메인 메뉴 =====");
 
@@ -546,7 +567,7 @@ void handleMainMenuScreen(const char* userID, const char* userName)
 
                 if (x >= 29 && x <= 57 && y >= 9 && y <= 11)
                 {
-                    // 나의 시간표 보기
+                    handleTimetableScreen(userID);
                 }
                 else if (x >= 29 && x <= 57 && y >= 13 && y <= 15)
                 {
@@ -565,7 +586,7 @@ void handleMainMenuScreen(const char* userID, const char* userName)
 void handleFriendsListScreen(const char* userID, const char* userName)
 {
     system("cls");
-    drawMainFrame(5, 1, 80, 35);
+    drawMainFrame(4, 1, 92, 47);
 
     gotoxy(32, 4);
     printf("===== 친구 목록 =====");
@@ -661,7 +682,7 @@ void handleFriendsListScreen(const char* userID, const char* userName)
 void handleAddFriendScreen(const char* userID)
 {
     system("cls");
-    drawMainFrame(5, 1, 80, 35);
+    drawMainFrame(4, 1, 92, 47);
 
     Friends newFriend;
     int isAlreadyFriend = 0;
@@ -729,5 +750,180 @@ void handleAddFriendScreen(const char* userID)
     _getch();
 }
 
-// 
+int getDayIndex(const char* day)
+{
+    if (strstr(day, "월")) return 0;
+    if (strstr(day, "화")) return 1;
+    if (strstr(day, "수")) return 2;
+    if (strstr(day, "목")) return 3;
+    if (strstr(day, "금")) return 4;
+    return -1;
+}
+
+int getStartHour(const char* timeStr)
+{
+    int hour = 0;
+    sscanf(timeStr, " %d", &hour); // 첫 숫자만 추출
+    return hour;
+}
+
+void handleTimetableScreen(const char* userID)
+{
+    system("cls");
+    drawMainFrame(4, 1, 92, 47);
+
+    int cellWidth = 15;      
+    int cellHeight = 3;     
+    int dayCellHeight = 3; 
+    int timeCellWidth = 7;  
+
+    int startX = 16;        
+    int startY = 7;       
+
+    const char* days[5] = { "월", "화", "수", "목", "금" };
+
+    // 화면 제목
+    gotoxy(39, 1);
+    printf(" %s님의 시간표", userID);
+
+    // 요일 칸
+    for (int d = 0; d < 5; d++)
+    {
+        int x = startX + d * cellWidth;
+        int y = startY - dayCellHeight;
+        drawButtonBox(x, y, cellWidth, dayCellHeight);
+        gotoxy(x + (cellWidth / 2) - 1, y + 1);
+        printf("%s", days[d]);
+    }
+
+    // 시간 칸
+    for (int h = 0; h < 11; h++)
+    {
+        int posY = startY + h * cellHeight;
+        drawButtonBox(startX - timeCellWidth - 1, posY, timeCellWidth, cellHeight);
+        gotoxy(startX - timeCellWidth + 1, posY + (cellHeight / 2));
+        printf("%02d시", 9 + h);
+    }
+
+    // 수업 칸
+    for (int row = 0; row < 11; row++)
+    {
+        int posY = startY + row * cellHeight;
+        for (int col = 0; col < 5; col++)
+        {
+            drawButtonBox(startX + col * cellWidth, posY, cellWidth, cellHeight);
+        }
+    }
+
+    FILE* timetableFile = fopen("Timetable.txt", "r");
+    if (!timetableFile) 
+    {
+        gotoxy(28, 45);
+        printf("시간표 데이터(Timetable.txt)를 열 수 없습니다.");
+        getchar();
+        return;
+    }
+
+    char line[256], codes[200] = { 0 };
+    while (fgets(line, sizeof(line), timetableFile)) 
+    {
+        char fileUser[50];
+        if (sscanf(line, "userID: %49[^/] / subjectCODE: %[^\n]", fileUser, codes) == 2) 
+        {
+            if (strcmp(fileUser, userID) == 0) 
+                break;
+        }
+    }
+    fclose(timetableFile);
+
+    if (strlen(codes) == 0) 
+    {
+        gotoxy(28, 45);
+        printf("시간표 데이터가 없습니다.");
+        getchar();
+        return;
+    }
+
+    int codesArr[50], codeCount = 0;
+    char* token = strtok(codes, ",");
+    while (token) 
+    {
+        codesArr[codeCount++] = atoi(token);
+        token = strtok(NULL, ",");
+    }
+
+    // 칸 사용 여부 체크
+    int occupied[5][13] = { 0 };
+
+    FILE* subjectFile = fopen("Subject.txt", "r");
+    if (!subjectFile) 
+    {
+        gotoxy(28, 45);
+        printf("과목 데이터(Subject.txt)를 열 수 없습니다.");
+        getchar();
+        return;
+    }
+
+    while (fgets(line, sizeof(line), subjectFile)) 
+    {
+        SubjectList sub;
+        if (sscanf(line,
+            "subjectCODE: %9[^/] / subjectNAME: %49[^/] / professorNAME: %49[^/] / subjectCATE: %19[^/] / WEEK: %19[^/] / TIME: %[^\n]",
+            sub.subjectCode, sub.subjectName, sub.professorName, sub.subCategory, sub.week, sub.time) == 6)
+        {
+            int subjectCodeInt = atoi(sub.subjectCode);
+            for (int i = 0; i < codeCount; i++) 
+            {
+                if (codesArr[i] == subjectCodeInt) 
+                {
+                    int dayIdx = getDayIndex(sub.week);
+
+                    int startHour = 0, endHour = 0;
+                    sscanf(sub.time, "%d : %*d ~ %d : %*d", &startHour, &endHour);
+
+                    int hourIdx = startHour - 9;
+                    int duration = endHour - startHour;
+                    if (duration <= 0) duration = 1;
+
+                    // 중복 체크
+                    int canPlace = 1;
+                    for (int h = hourIdx; h < hourIdx + duration && h < 13; h++) 
+                    {
+                        if (occupied[dayIdx][h] == 1) 
+                        {
+                            canPlace = 0;
+                            break;
+                        }
+                    }
+
+                    // 빈칸일 때만 표시
+                    if (canPlace && dayIdx >= 0 && hourIdx >= 0 && hourIdx < 13) 
+                    {
+                        int boxY = startY + hourIdx * cellHeight;
+                        int boxHeight = cellHeight * duration;
+
+                        int randColor = getRandomColor();
+                        setColor(randColor);
+
+                        drawButtonBox(startX + dayIdx * cellWidth, boxY, cellWidth, boxHeight);
+                        gotoxy(startX + dayIdx * cellWidth + 1, boxY + 1);
+                        printf("%s", sub.subjectName);
+
+                        setColor(7); // 7(흰색)
+
+                        for (int h = hourIdx; h < hourIdx + duration && h < 13; h++) 
+                        {
+                            occupied[dayIdx][h] = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fclose(subjectFile);
+
+    gotoxy(28, 45);
+    printf("아무 키나 누르면 돌아갑니다...");
+    getchar();
+}
 
