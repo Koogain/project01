@@ -1,2 +1,4 @@
-userID: cloud0527 / friendNAME: skyKOO / friendID: sky0527 / friendPIN: 1
-userID: sky0527 / friendNAME: cloudCHOI / friendID: cloud0527 / friendPIN: 0
+userID: cloud0527 / friendName: skyKOO / friendID: sky0527 / friendPin: 1
+userID: sky0527 / friendName: cloudCHOI / friendID: cloud0527 / friendPin: 0
+userID: cloud0527 / friendName: dddd / friendID: dddd / friendPin: 0
+userID: dddd / friendName: cloud0527 / friendID: cloud0527 / friendPin: 0
