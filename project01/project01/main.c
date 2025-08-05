@@ -301,24 +301,22 @@ void handleSignupScreen()
 
     Member user;  // 구조체 사용
 
-    drawMainFrame(5, 1, 85, 38);
+    drawMainFrame(4, 1, 92, 47);
 
     gotoxy(32, 4);  printf("===== 회원가입 창 =====");
 
     // 입력창
     gotoxy(25, 8);  printf("이름: ");
     drawButtonBox(35, 7, 30, 3);
-    getTextInput(36, 8, user.userName, sizeof(user.userName) - 1);
-
     gotoxy(25, 11); printf("아이디: ");
     drawButtonBox(35, 10, 30, 3);
-    getTextInput(36, 11, user.userID, sizeof(user.userID) - 1);
-
     gotoxy(25, 14); printf("비밀번호: ");
     drawButtonBox(35, 13, 30, 3);
-    getTextInput(36, 14, user.userPW, sizeof(user.userPW) - 1);
-
     gotoxy(36, 19); printf("[ 확인 ]");
+
+    getTextInput(36, 8, user.userName, sizeof(user.userName) - 1);
+    getTextInput(36, 11, user.userID, sizeof(user.userID) - 1);
+    getTextInput(36, 14, user.userPW, sizeof(user.userPW) - 1);
 
     // 마우스 입력
     HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
@@ -380,7 +378,8 @@ void handleSignupScreen()
     {
         gotoxy(30, 23);
         printf(" 이미 존재하는 아이디입니다.");
-        _getch();
+        system("cls");
+        handleSignupScreen();
         return;
     }
 

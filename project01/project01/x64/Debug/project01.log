@@ -4,7 +4,7 @@ C:\Users\Koomy\source\repos\project01\project01\main.c(189,46): warning C4028: �
 C:\Users\Koomy\source\repos\project01\project01\main.c(189,60): warning C4028: 정식 매개 변수 3이(가) 선언과 다릅니다.
 C:\Users\Koomy\source\repos\project01\project01\main.c(225,86): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\Koomy\source\repos\project01\project01\main.c(298,6): warning C4026: 정식 매개 변수 목록을 사용하여 함수를 선언했습니다.
-C:\Users\Koomy\source\repos\project01\project01\main.c(457,39): warning C4090: '함수': 다른 'const' 한정자
-C:\Users\Koomy\source\repos\project01\project01\main.c(457,49): warning C4090: '함수': 다른 'const' 한정자
-C:\Users\Koomy\source\repos\project01\project01\main.c(457,57): warning C4090: '함수': 다른 'const' 한정자
+C:\Users\Koomy\source\repos\project01\project01\main.c(456,39): warning C4090: '함수': 다른 'const' 한정자
+C:\Users\Koomy\source\repos\project01\project01\main.c(456,49): warning C4090: '함수': 다른 'const' 한정자
+C:\Users\Koomy\source\repos\project01\project01\main.c(456,57): warning C4090: '함수': 다른 'const' 한정자
   project01.vcxproj -> C:\Users\Koomy\source\repos\project01\x64\Debug\project01.exe
