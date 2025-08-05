@@ -25,60 +25,54 @@ HANDLE hConsole;
 #define SIGNUP_X 14
 #define SIGNUP_Y 14
 
-// 전역 변수
-char globalID[50] = "";
-char globalPW[50] = "";
-
 // 함수 전방 선언
 bool isInside(int x, int y, int left, int top, int right, int bottom);
 void gotoxy(int x, int y);
 void trimAll(char* str);
-
+void setColor(int color);
+int getRandomColor();
 void drawMainFrame(int x, int y, int width, int height);
-void drawIDButton(int x, int y);
-void drawPWInputBox(int x, int y);
-void drawLoginButton(int x, int y);
-void drawSignupText(int x, int y);
-
-void listenForClick();
-void handleLogin(const char* id, const char* pw);
-void handleSignupScreen();
-void drawInputBox(int x, int y, int width);
+void drawButtonBox(int x, int y, int width, int height);
 void getTextInput(int x, int y, char* buffer, int maxLen);
-void waitForSignupClick(char* name, char* id, char* pw);
+
+void handleLoginScreen(const char* userName, const char* userID, const char* userPW);
+void handleSignupScreen(const char* userName, const char* userID, const char* userPW);
+
+void handleMainMenuScreen(const char* userName, const char* userID, const char* userPW);
+
+int getDayIndex(const char* day);
+int getStartHour(const char* timeStr);
 
 void handleTimetableScreen(const char* userID);
 
-void handleMainMenuScreen(const char* userID, const char* userName);
-void handleFriendsListScreen(const char* userID, const char* userName);
-void handleAddFriendScreen(const char* userID);
+void handleFriendsListScreen(const char* userName, const char* userID, const char* userPW);
+void handleAddFriendScreen(const char* userName, const char* userID);
 
-bool isInside(int x, int y, int left, int top, int right, int bottom);
+// 전역 변수
+char userName[50] = { 0 };
+char userID[50] = { 0 };
+char userPW[50] = { 0 };
 
 // 메인함수
-int main(void)
+int main(const char* userName, const char* userID, const char* userPW)
 {
-    system("MODE CON:COLS=100 LINES=50");
+    system("MODE CON:COLS=100 LINES=50");      // 콘솔 창 크기 설정
     system("cls");
 
     drawMainFrame(4, 1, 92, 47);      // 전체 틀
-    drawIDButton(25, 6);             // 로그인 버튼
-    drawPWInputBox(25, 12);         // 비밀번호 입력
-    drawLoginButton(27, 20);  // [ 로그인 버튼 ]
-    drawSignupText(45, 20);    // [ 회원가입 ]
 
-    listenForClick();   // 클릭 대기
+    handleLoginScreen(userName, userID, userPW);
 
     gotoxy(0, 22); // 커서 내리기
     _getch();
     return 0;
 }
 
-// 기본 함수
+// 기본 기능 함수
 bool isInside(int x, int y, int left, int top, int right, int bottom)
 {
     return (x >= left && x <= right && y >= top && y <= bottom);
-}
+}  
 
 void gotoxy(int x, int y) 
 {
@@ -114,14 +108,13 @@ int getRandomColor()
     return color;
 }
 
-// 기능 함수
-void drawMainFrame(int x, int y, int width, int height) 
+void drawMainFrame(int x, int y, int width, int height)
 {
     gotoxy(x, y); printf("┌");
     for (int i = 0; i < width - 2; i++) printf("─");
     printf("┐");
 
-    for (int j = 1; j < height - 1; j++) 
+    for (int j = 1; j < height - 1; j++)
     {
         gotoxy(x, y + j);
         printf("│");
@@ -134,72 +127,7 @@ void drawMainFrame(int x, int y, int width, int height)
     printf("┘");
 }
 
-void drawIDButton(int x, int y)
-{
-    int width = 35;
-
-    gotoxy(x, y);
-    printf("로그인: ");
-
-    // 박스를 아래에 그림 (y+1부터)
-    gotoxy(x, y + 1);
-    printf("┌");
-    for (int i = 0; i < width - 2; i++) printf("─");
-    printf("┐");
-
-    // 중간 줄 (입력창)
-    gotoxy(x, y + 2);
-    printf("│");
-    for (int i = 0; i < width - 2; i++) printf(" ");
-    printf("│");
-
-    // 아래 줄
-    gotoxy(x, y + 3);
-    printf("└");
-    for (int i = 0; i < width - 2; i++) printf("─");
-    printf("┘");
-}
-
-void drawPWInputBox(int x, int y)
-{
-    int width = 35;
-
-    gotoxy(x, y);
-    printf("비밀번호: ");
-
-    // 박스를 아래에 그림 (y+1부터)
-    gotoxy(x, y + 1);
-    printf("┌");
-    for (int i = 0; i < width - 2; i++) printf("─");
-    printf("┐");
-
-    // 중간 줄 (입력창)
-    gotoxy(x, y + 2);
-    printf("│");
-    for (int i = 0; i < width - 2; i++) printf(" ");
-    printf("│");
-
-    // 아래 줄
-    gotoxy(x, y + 3);
-    printf("└");
-    for (int i = 0; i < width - 2; i++) printf("─");
-    printf("┘");
-}
-
-void drawLoginButton(int x, int y) 
-{
-    gotoxy(x, y);
-    printf("[  로그인  ]");
-}
-
-void drawSignupText(int x, int y) 
-{
-    gotoxy(x, y);
-    printf("[ 회원가입 ]");
-}
-
-// 버튼 박스 그리는 함수
-void drawButtonBox(int x, int y, int width, int height) 
+void drawButtonBox(int x, int y, int width, int height)
 {
     // 윗줄
     gotoxy(x, y);
@@ -208,7 +136,7 @@ void drawButtonBox(int x, int y, int width, int height)
     printf("┐");
 
     // 중간줄
-    for (int i = 0; i < height - 2; i++) 
+    for (int i = 0; i < height - 2; i++)
     {
         gotoxy(x, y + 1 + i);
         printf("│");
@@ -223,25 +151,57 @@ void drawButtonBox(int x, int y, int width, int height)
     printf("┘");
 }
 
-// 텍스트 입력 박스 그리는 함수
-void drawInputBox(int x, int y, int width)
+void getTextInput(int x, int y, char* buffer, int maxLen)
 {
-    gotoxy(x, y);     printf("┌");
-    for (int i = 0; i < width - 2; i++) printf("─");
-    printf("┐");
+    int i = 0;
+    char ch;
 
-    gotoxy(x, y + 1); printf("│");
-    for (int i = 0; i < width - 2; i++) printf(" ");
-    printf("│");
+    gotoxy(x, y);  // 입력 시작 위치로 커서 이동
 
-    gotoxy(x, y + 2); printf("└");
-    for (int i = 0; i < width - 2; i++) printf("─");
-    printf("┘");
+    while (1)
+    {
+        ch = _getch();
+
+        if (ch == 13)  // Enter
+        {
+            buffer[i] = '\0';
+            break;
+        }
+        else if (ch == 8 && i > 0)  // Backspace
+        {
+            i--;
+            buffer[i] = '\0';
+            gotoxy(x + i, y);
+            printf(" ");
+            gotoxy(x + i, y);
+        }
+        else if (i < maxLen && ch >= 32 && ch <= 126)  // 입력 가능한 문자
+        {
+            buffer[i++] = ch;
+            gotoxy(x + i - 1, y);
+            printf("%c", ch);
+        }
+    }
+    buffer[i] = '\0';
 }
 
-//
-void listenForClick()
+// 활용 기능 함수
+void handleLoginScreen(char* userName, char* userID, char* userPW)
 {
+    system("cls");
+    drawMainFrame(4, 1, 92, 47);
+
+    gotoxy(32, 4);  printf("===== 로그인 창 =====");
+
+    gotoxy(25, 6);  printf("아이디 : ");
+    drawButtonBox(25, 8, 35, 3);
+
+    gotoxy(25, 12); printf("비밀번호 : ");
+    drawButtonBox(25, 14, 35, 3);
+
+    gotoxy(27, 20); printf("[  로그인  ]");
+    gotoxy(45, 20); printf("[ 회원가입 ]");
+
     HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
     SetConsoleMode(hInput, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
 
@@ -261,72 +221,77 @@ void listenForClick()
                 int clickX = mouse.dwMousePosition.X;
                 int clickY = mouse.dwMousePosition.Y;
 
-                // [회원가입]
+                // 회원가입 버튼
                 if (isInside(clickX, clickY, 45, 20, 45 + strlen("[ 회원가입 ]") - 1, 20))
                 {
-                    handleSignupScreen();
+                    handleSignupScreen(userName, userID, userPW);
                     break;
                 }
 
-                // [로그인]
+                // 로그인 버튼
                 else if (isInside(clickX, clickY, 27, 20, 37, 20))
                 {
-                    handleLogin(globalID, globalPW);
+                    FILE* file = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Member.txt", "r");
+                    if (!file)
+                    {
+                        gotoxy(26, 23);
+                        printf("파일을 열 수 없습니다.");
+                        continue;
+                    }
+
+                    char line[200];
+                    Member loginUser = { 0 };
+                    int isMatch = 0;
+
+                    while (fgets(line, sizeof(line), file))
+                    {
+                        if (sscanf(line, "userNAME: %49[^/]/ userID: %49[^/]/ userPW: %49[^\n]",
+                            loginUser.userName, loginUser.userID, loginUser.userPW) == 3)
+                        {
+                            trimAll(loginUser.userID);
+                            trimAll(loginUser.userPW);
+
+                            if (strcmp(loginUser.userID, userID) == 0 && strcmp(loginUser.userPW, userPW) == 0)
+                            {
+                                strncpy(userName, loginUser.userName, sizeof(loginUser.userName) - 1);
+                                userName[sizeof(loginUser.userName) - 1] = '\0';  // 문자열 끝 보장
+
+                                gotoxy(26, 23);
+                                printf(" 로그인 성공! 환영합니다, %s님", userName);
+                                Sleep(1000);
+                                fclose(file);
+                                system("cls");
+                                handleMainMenuScreen(userName, userID, userPW);
+                                return;  // 함수 종료
+                            }
+                        }
+                    }
+                    fclose(file);
+
+                    // 로그인 실패 시
+                    gotoxy(26, 23);
+                    printf(" 로그인 실패! 아이디 또는 비밀번호 확인");
                 }
 
-                // ID 입력 박스
-                else if (isInside(clickX, clickY, 26, 8, 60, 8))
+                // ID 입력 박스 클릭 시
+                else if (isInside(clickX, clickY, 26, 9, 60, 9))
                 {
-                    gotoxy(26, 8);
-                    getTextInput(26, 8, globalID, 49);
+                    gotoxy(26, 9);
+                    printf("                                        ");
+                    gotoxy(26, 9);
+                    getTextInput(26, 9, userID, 49);
                 }
 
-                // PW 입력 박스
-                else if (isInside(clickX, clickY, 26, 14, 60, 14))
+                // PW 입력 박스 클릭 시
+                else if (isInside(clickX, clickY, 26, 15, 60, 15))
                 {
-                    gotoxy(26, 14);
-                    getTextInput(26, 14, globalPW, 49);
+                    gotoxy(26, 15);
+                    printf("                                        ");
+                    gotoxy(26, 15);
+                    getTextInput(26, 15, userPW, 49);
                 }
             }
         }
-    }
-}
-
-void handleLogin(const char* id, const char* pw)
-{
-    FILE* file = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Member.txt", "r");
-    char line[150];
-    Member user; 
-    int isMatch = 0;
-
-    if (file)
-    {
-        while (fgets(line, sizeof(line), file))
-        {
-            if (sscanf(line, "userNAME: %[^/] / userID: %s / userPW: %s",
-                user.userName, user.userID, user.userPW) == 3)
-            {
-                if (strcmp(user.userID, id) == 0 && strcmp(user.userPW, pw) == 0)
-                {
-                    isMatch = 1;
-                    break;
-                }
-            }
-        }
-        fclose(file);
-    }
-
-    gotoxy(26, 23);
-    if (isMatch)
-    {
-        printf(" 로그인 성공! 환영합니다, %s님", user.userName);
-        Sleep(1000);
-        system("cls");
-        handleMainMenuScreen(user.userID, user.userName);
-    }
-    else
-    {
-        printf(" 로그인 실패! 아이디 또는 비밀번호 확인");
     }
 }
 
@@ -342,15 +307,15 @@ void handleSignupScreen()
 
     // 입력창
     gotoxy(25, 8);  printf("이름: ");
-    drawInputBox(35, 7, 30);
+    drawButtonBox(35, 7, 30, 3);
     getTextInput(36, 8, user.userName, sizeof(user.userName) - 1);
 
     gotoxy(25, 11); printf("아이디: ");
-    drawInputBox(35, 10, 30);
+    drawButtonBox(35, 10, 30, 3);
     getTextInput(36, 11, user.userID, sizeof(user.userID) - 1);
 
     gotoxy(25, 14); printf("비밀번호: ");
-    drawInputBox(35, 13, 30);
+    drawButtonBox(35, 13, 30, 3);
     getTextInput(36, 14, user.userPW, sizeof(user.userPW) - 1);
 
     gotoxy(36, 19); printf("[ 확인 ]");
@@ -439,93 +404,7 @@ void handleSignupScreen()
     }
 }
 
-void getTextInput(int x, int y, char* buffer, int maxLen) 
-{
-    int i = 0;
-    char ch;
-    while (1) 
-    {
-        ch = _getch();
-        if (ch == 13) 
-        { // Enter
-            buffer[i] = '\0';
-            break;
-        }
-        else if (ch == 8 && i > 0) 
-        { // Backspace
-            i--;
-            buffer[i] = '\0';
-            gotoxy(x + i, y);
-            printf(" ");
-            gotoxy(x + i, y);
-        }
-        else if (i < maxLen && ch >= 32 && ch <= 126) 
-        {
-            buffer[i++] = ch;
-            gotoxy(x + i - 1, y);
-            printf("%c", ch);
-        }
-    }
-}
-
-//
-void waitForSignupClick(char* name, char* id, char* pw)
-{
-    HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
-    DWORD prevMode;
-    GetConsoleMode(hInput, &prevMode);
-    SetConsoleMode(hInput, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
-
-    INPUT_RECORD inputRecord;
-    DWORD events;
-
-    while (1)
-    {
-        ReadConsoleInput(hInput, &inputRecord, 1, &events);
-
-        if (inputRecord.EventType == MOUSE_EVENT)
-        {
-            MOUSE_EVENT_RECORD m = inputRecord.Event.MouseEvent;
-
-            if (m.dwEventFlags == 0 && (m.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED))
-            {
-                int x = m.dwMousePosition.X;
-                int y = m.dwMousePosition.Y;
-
-                // 이름 박스
-                if (x >= 30 && x <= 59 && y == 8)
-                {
-                    gotoxy(31, 8);
-                    getTextInput(31, 8, name, false);
-                }
-
-                // 아이디 박스
-                else if (x >= 30 && x <= 59 && y == 11)
-                {
-                    gotoxy(31, 11);
-                    getTextInput(31, 11, id, false);
-                }
-
-                // 비밀번호 박스
-                else if (x >= 30 && x <= 59 && y == 14)
-                {
-                    gotoxy(31, 14);
-                    getTextInput(31, 14, pw, true);
-                }
-
-                // [확인]을 클릭했다고 가정하는 y좌표 처리 (예시)
-                else if (x >= 20 && x <= 35 && y == 17)
-                {
-                    break;  // 입력 완료
-                }
-            }
-        }
-    }
-}
-
-
-//
-void handleMainMenuScreen(const char* userID, const char* userName)
+void handleMainMenuScreen(const char* userID, const char* userName, const char* userPW)
 {
     system("cls");
 
@@ -571,11 +450,11 @@ void handleMainMenuScreen(const char* userID, const char* userName)
                 }
                 else if (x >= 29 && x <= 57 && y >= 13 && y <= 15)
                 {
-                    handleFriendsListScreen(userID, userName); 
+                    handleFriendsListScreen(userName, userID, userPW);
                 }
                 else if (x >= 29 && x <= 57 && y >= 17 && y <= 19)
                 {
-                    main();
+                    handleLoginScreen(userName, userID, userPW);
                     break;
                 }
             }
@@ -583,7 +462,7 @@ void handleMainMenuScreen(const char* userID, const char* userName)
     }
 }
 
-void handleFriendsListScreen(const char* userID, const char* userName)
+void handleFriendsListScreen(const char* userID, const char* userName, const char* userPW)
 {
     system("cls");
     drawMainFrame(4, 1, 92, 47);
@@ -663,15 +542,15 @@ void handleFriendsListScreen(const char* userID, const char* userName)
                 // [친구 추가] 클릭
                 if (x >= 27 && x <= 38 && y == 30)
                 {
-                    handleAddFriendScreen(userID);
+                    handleAddFriendScreen(userName, userID);
                     system("cls");
-                    handleFriendsListScreen(userID, userName);
+                    handleFriendsListScreen(userID, userName, userPW);
                     break;
                 }
                 // [뒤로가기] 클릭
                 else if (x >= 43 && x <= 53 && y == 30)
                 {
-                    handleMainMenuScreen(userID, userName);
+                    handleMainMenuScreen(userID, userName, userPW);
                     break;
                 }
             }
@@ -679,7 +558,7 @@ void handleFriendsListScreen(const char* userID, const char* userName)
     }
 }
 
-void handleAddFriendScreen(const char* userID)
+void handleAddFriendScreen(const char* userName, const char* userID)
 {
     system("cls");
     drawMainFrame(4, 1, 92, 47);
@@ -692,11 +571,11 @@ void handleAddFriendScreen(const char* userID)
 
     // 입력창
     gotoxy(25, 8);  printf("친구 이름: ");
-    drawInputBox(40, 7, 25);
+    drawButtonBox(40, 7, 10, 25);
     getTextInput(41, 8, newFriend.friendName, sizeof(newFriend.friendName));
 
     gotoxy(25, 11); printf("친구 ID: ");
-    drawInputBox(40, 10, 25);
+    drawButtonBox(40, 10, 10, 25);
     getTextInput(41, 11, newFriend.friendID, sizeof(newFriend.friendID));
 
     trimAll(newFriend.friendName);
