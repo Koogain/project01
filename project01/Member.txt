@@ -1,7 +1,4 @@
 userNAME: cloudCHOI / userID: cloud0527 / userPW: 12345678!
 userNAME: skyKOO / userID: sky0527 / userPW: 87654321!
 userNAME: dddd / userID: dddd / userPW: dddd
-userNAME: hi1111 / userID: hi1111 / userPW: 1234
-userNAME: bye1234 / userID: bye1234 / userPW: 1234
-userNAME: qwe123 / userID: qwe123 / userPW: 1234
-
+userNAME: 1 / userID: 1 / userPW: 1
