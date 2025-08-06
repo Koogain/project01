@@ -186,11 +186,11 @@ void handleLoginScreen(char* userName, char* userID, char* userPW)
 
     // 아이디 입력창
     gotoxy(31, 9);  printf("아이디 : ");
-    drawBox(31, 11, 35, 3);  // (x=31, y=11) 크기: 35x3
+    drawBox(31, 11, 35, 3);  
 
     // 비밀번호 입력창
     gotoxy(31, 15); printf("비밀번호 : ");
-    drawBox(31, 17, 35, 3);  // (x=31, y=17)
+    drawBox(31, 17, 35, 3); 
 
     // 버튼
     gotoxy(33, 24); printf("[  로그인  ]");
@@ -215,14 +215,14 @@ void handleLoginScreen(char* userName, char* userID, char* userPW)
                 int clickX = mouse.dwMousePosition.X;
                 int clickY = mouse.dwMousePosition.Y;
 
-                // [회원가입] 버튼 (50~61, y=24)
+                // [회원가입] 버튼 
                 if (isInside(clickX, clickY, 50, 24, 61, 24))
                 {
                     handleSignupScreen(userName, userID, userPW);
                     break;
                 }
 
-                // [로그인] 버튼 (33~44, y=24)
+                // [로그인] 버튼 
                 else if (isInside(clickX, clickY, 33, 24, 44, 24))
                 {
                     FILE* file = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Member.txt", "r");
@@ -251,7 +251,7 @@ void handleLoginScreen(char* userName, char* userID, char* userPW)
                                 userName[sizeof(loginUser.userName) - 1] = '\0';
 
                                 gotoxy(31, 28);
-                                printf(" 로그인 성공! 환영합니다, %s님", userName);
+                                printf(" 【  회원가입 성공!, 환영합니다, %s님  】 ", userName);
                                 Sleep(1000);
                                 fclose(file);
                                 system("cls");
@@ -439,7 +439,7 @@ void handleSignupScreen()
                         fclose(file);
 
                         gotoxy(33, 32);
-                        printf("회원가입 성공!");
+                        printf(" 【  회원가입 성공!  】 ");
                         Sleep(1000);
 
                         SetConsoleMode(hInput, prevMode);
@@ -644,63 +644,157 @@ void handleAddFriendScreen(const char* userName, const char* userID)
     printf("===== 친구 추가 =====");
 
     // 입력창
-    gotoxy(25, 8);  printf("친구 이름: ");
-    drawBox(40, 7, 10, 25);
-    getTextInput(41, 8, newFriend.friendName, sizeof(newFriend.friendName));
+    gotoxy(31, 9);  printf("친구 이름 : ");
+    drawBox(31, 11, 30, 3);
 
-    gotoxy(25, 11); printf("친구 ID: ");
-    drawBox(40, 10, 10, 25);
-    getTextInput(41, 11, newFriend.friendID, sizeof(newFriend.friendID));
+    gotoxy(31, 15); printf("친구 아이디 : ");
+    drawBox(31, 17, 30, 3);
+
+    gotoxy(33, 30); printf("[ 친구 추가 ]");
+    gotoxy(50, 30); printf("[ 친구 목록 ]");
 
     trimAll(newFriend.friendName);
     trimAll(newFriend.friendID);
 
-    // 중복 친구 여부 확인
-    FILE* checkFile = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Friends.txt", "r");
-    char line[256];
-    Friends friendData;
+    HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD prevMode;
+    GetConsoleMode(hInput, &prevMode);
+    SetConsoleMode(hInput, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
 
-    if (checkFile)
+    INPUT_RECORD record;
+    DWORD events;
+
+    while (1)
     {
-        while (fgets(line, sizeof(line), checkFile))
-        {
-            if (sscanf(line, "userID: %49[^/] / friendName: %49[^/] / friendID: %49[^/] / friendPin: %9s",
-                friendData.userID, friendData.friendName, friendData.friendID, friendData.friendPin) == 4)
-            {
-                trimAll(friendData.userID);
-                trimAll(friendData.friendID);
+        ReadConsoleInput(hInput, &record, 1, &events);
 
-                if (strcmp(friendData.userID, userID) == 0 &&
-                    strcmp(friendData.friendID, newFriend.friendID) == 0)
+        if (record.EventType == MOUSE_EVENT)
+        {
+            MOUSE_EVENT_RECORD mouse = record.Event.MouseEvent;
+            int clickX = mouse.dwMousePosition.X;
+            int clickY = mouse.dwMousePosition.Y;
+
+            if (mouse.dwEventFlags == MOUSE_MOVED)
+            {
+                // 친구 추가 버튼 hover
+                if (isInside(clickX, clickY, 33, 30, 41, 30))
                 {
-                    isAlreadyFriend = 1;
-                    break;
+                    setColor(10); // 초록색
+                    gotoxy(33, 30); printf("[ 친구 추가 ]");
+                }
+                else
+                {
+                    setColor(15); // 흰색
+                    gotoxy(33, 30); printf("[ 친구 추가 ]");
+                }
+
+                // 친구 목록 화면 이동 버튼 hover
+                if (isInside(clickX, clickY, 50, 30, 65, 30))
+                {
+                    setColor(10);
+                    gotoxy(50, 30); printf("[ 친구 목록 ]");
+                    return;
+                }
+                else
+                {
+                    setColor(15);
+                    gotoxy(50, 30); printf("[ 친구 목록 ]");
+                }
+
+                setColor(15); // 기본 색상 복원
+            }
+
+            if ((mouse.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) && mouse.dwEventFlags == 0)
+            {
+                // 친구 이름 입력 박스
+                if (isInside(clickX, clickY, 31, 11, 61, 13))
+                {
+                    gotoxy(32, 12);
+                    printf("                         ");
+                    gotoxy(32, 12);
+                    getTextInput(32, 12, newFriend.friendName, sizeof(newFriend.friendName) - 1);
+                }
+                // 친구 아이디 입력 박스
+                else if (isInside(clickX, clickY, 31, 17, 61, 19))
+                {
+                    gotoxy(32, 18);
+                    printf("                         ");
+                    gotoxy(32, 18);
+                    getTextInput(32, 18, newFriend.friendID, sizeof(newFriend.friendID) - 1);
+                }
+                // 확인 버튼 클릭
+                else if (isInside(clickX, clickY, 33, 30, 42, 30))
+                {
+                    // 입력값 검증
+                    if (strlen(newFriend.friendName) == 0 || strlen(newFriend.friendID) == 0)
+                    {
+                        gotoxy(33, 32);
+                        printf("친구 추가 실패! (모든 칸을 입력하세요)");
+                        Sleep(1500);
+                        gotoxy(33, 32);
+                        printf("                                     "); // 메시지 지우기
+                        continue; // 다시 입력 대기
+                    }
+
+                    // 중복 친구 여부 확인
+                    FILE* checkFile = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Friends.txt", "r");
+                    char line[256];
+                    Friends friendData;
+
+                    if (checkFile)
+                    {
+                        while (fgets(line, sizeof(line), checkFile))
+                        {
+                            if (sscanf(line, "userID: %49[^/] / friendName: %49[^/] / friendID: %49[^/] / friendPin: %9s",
+                                friendData.userID, friendData.friendName, friendData.friendID, friendData.friendPin) == 4)
+                            {
+                                trimAll(friendData.userID);
+                                trimAll(friendData.friendID);
+
+                                if (strcmp(friendData.userID, userID) == 0 &&
+                                    strcmp(friendData.friendID, newFriend.friendID) == 0)
+                                {
+                                    isAlreadyFriend = 1;
+                                    break;
+                                }
+                            }
+                        }
+                        fclose(checkFile);
+                    }
+
+                    // 결과 처리
+                    if (isAlreadyFriend)
+                    {
+                        gotoxy(28, 23);
+                        printf(" 이미 등록된 친구입니다.");
+                    }
+                    else
+                    {
+                        FILE* file = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Friends.txt", "a");
+                        if (file)
+                        {
+                            fprintf(file, "userID: %s / friendName: %s / friendID: %s / friendPin: 0\n",
+                                userID, newFriend.friendName, newFriend.friendID);
+                            fclose(file);
+                        }
+                        gotoxy(28, 23);
+                        printf(" 친구가 성공적으로 추가되었습니다!");
+                        handleFriendsListScreen(userID, userName, userPW);
+                    }
+                }
+                // 친구 목록 화면 이동 
+                else if (isInside(clickX, clickY, 50, 30, 59, 30))
+                {
+                    SetConsoleMode(hInput, prevMode);
+                    system("cls");
+                    handleFriendsListScreen(userID, userName, userPW);
+                    return;
                 }
             }
         }
-        fclose(checkFile);
     }
-
-    // 결과 처리
-    if (isAlreadyFriend)
-    {
-        gotoxy(28, 23);
-        printf(" 이미 등록된 친구입니다.");
-    }
-    else
-    {
-        FILE* file = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Friends.txt", "a");
-        if (file)
-        {
-            fprintf(file, "userID: %s / friendName: %s / friendID: %s / friendPin: 0\n",
-                userID, newFriend.friendName, newFriend.friendID);
-            fclose(file);
-        }
-        gotoxy(28, 23);
-        printf(" 친구가 성공적으로 추가되었습니다!");
-    }
-
-    _getch();
+    // 기존 콘솔 모드 복원
+    SetConsoleMode(hInput, prevMode);
 }
 
 int getDayIndex(const char* day)
@@ -916,7 +1010,8 @@ void handleTimetableScreen(const char* userID)
                 // 메인메뉴 버튼 
                 else if (isInside(clickX, clickY, 56, 45, 56 + 7, 45))
                 {
-                    // 메인메뉴 동작
+                    handleMainMenuScreen(userID, userName, userPW);
+                        break;
                 }
 
             }
@@ -928,14 +1023,13 @@ void handleSubjectList(const char* userID)
 {
     system("cls");
     SubjectList subjectdata;
-    SubjectList allSubjects[200]; // 최대 200개 가정
+    SubjectList allSubjects[300];
 
     char line[256];
     int totalSubjects = 0;
-    int itemsPerPage = 10;
+    int itemsPerPage = 8;
     int page = 1;
     int currentIndex = 0;
-    int running = 1;
 
     FILE* file = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Subject.txt", "r");
     if (!file)
@@ -950,9 +1044,9 @@ void handleSubjectList(const char* userID)
     while (fgets(line, sizeof(line), file))
     {
         if (sscanf(line,
-            "subjectCode: %49[^/] / subjectName: %49[^/] / subCategory: %49[^/] / professorName: %49[^/] / week: %9[^/] / time: %49s",
-            subjectdata.subjectCode, subjectdata.subjectName, subjectdata.subCategory,
-            subjectdata.professorName, subjectdata.week, subjectdata.time) == 6)
+            "subjectCODE: %49[^/] / subjectNAME: %49[^/] / professorNAME: %49[^/] / subjectCATE: %49[^/] / WEEK: %49[^/] / TIME: %[^\n]",
+            subjectdata.subjectCode, subjectdata.subjectName, subjectdata.professorName,
+            subjectdata.subCategory, subjectdata.week, subjectdata.time) == 6)
         {
             trimAll(subjectdata.subjectCode);
             trimAll(subjectdata.subjectName);
@@ -961,7 +1055,6 @@ void handleSubjectList(const char* userID)
             trimAll(subjectdata.week);
             trimAll(subjectdata.time);
 
-            // 특정 유저 필터링을 적용하려면 여기에 조건 추가
             allSubjects[totalSubjects++] = subjectdata;
         }
     }
@@ -975,39 +1068,20 @@ void handleSubjectList(const char* userID)
     INPUT_RECORD record;
     DWORD events;
 
-    while (running)
+    while (1)
     {
         system("cls");
 
+        // 총 페이지 계산
+        int totalPages = (totalSubjects + itemsPerPage - 1) / itemsPerPage;
         gotoxy(30, 5);
-        printf(" ▶-----   강의 목록 (페이지 %d/%d)   -----◀", page, (totalSubjects + itemsPerPage - 1) / itemsPerPage);
+        printf(" ▶-----   강의 목록 (페이지 %d/%d)   -----◀", page, totalPages);
 
-        // 강의 목록 출력
+        // 강의 목록 출력 (박스는 강의 수만큼)
         int yPos = 8;
         int subjectCount = 0;
         for (int i = currentIndex; i < totalSubjects && subjectCount < itemsPerPage; i++)
-
         {
-            /*
-            FILE* subjectList = fopen("C:\\Users\\Koomy\\source\\repos\\project01\\Subject.txt", "r");
-            if (sscanf(line,
-                "userID: %49[^/] / friendName: %49[^/] / friendID: %49[^/] / friendPin: %9s",
-                friendData.userID, friendData.friendName, friendData.friendID, friendData.friendPin) == 4)
-            {
-                trimAll(friendData.userID);
-                trimAll(friendData.friendName);
-                trimAll(friendData.friendID);
-
-                if (strcmp(friendData.userID, userID) == 0)
-                {
-                    gotoxy(20, yPos);
-                    printf("친구 이름 : %-12s ( ID : %-12s)", friendData.friendName, friendData.friendID);
-                    yPos += 2;
-                    friendCount++;
-                }
-            }
-            */
-
             drawBox(20, yPos, 70, 3);
             gotoxy(22, yPos + 1);
             printf("%-8s | %-10s | %-8s | %-10s | %-4s | %s",
@@ -1036,7 +1110,6 @@ void handleSubjectList(const char* userID)
             int clickX = mouse.dwMousePosition.X;
             int clickY = mouse.dwMousePosition.Y;
 
-            // 마우스 클릭 감지
             if ((mouse.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) && mouse.dwEventFlags == 0)
             {
                 // 이전 페이지 버튼
@@ -1057,9 +1130,10 @@ void handleSubjectList(const char* userID)
                         page++;
                     }
                 }
-                // 시간표 돌아가기 버튼
+                // 시간표로 돌아가기 버튼
                 else if (isInside(clickX, clickY, 60, 45, 75, 45))
                 {
+                    SetConsoleMode(hInput, prevMode);
                     handleTimetableScreen(userID);
                     break;
                 }
@@ -1070,5 +1144,6 @@ void handleSubjectList(const char* userID)
     // 콘솔 모드 복원
     SetConsoleMode(hInput, prevMode);
 }
+
 
 
