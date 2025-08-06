@@ -172,8 +172,31 @@ void getTextInput(int x, int y, char* buffer, int maxLen)
     buffer[i] = '\0';
 }
 
+// ------------------------------------------
+// 메인 활용 기능 부가 함수 (시간표 부가 함수)
+// ------------------------------------------
+
+// 요일 함수
+int getDayIndex(const char* day)
+{
+    if (strstr(day, "월")) return 0;
+    if (strstr(day, "화")) return 1;
+    if (strstr(day, "수")) return 2;
+    if (strstr(day, "목")) return 3;
+    if (strstr(day, "금")) return 4;
+    return -1;
+}
+
+// 시간 함수
+int getStartHour(const char* timeStr)
+{
+    int hour = 0;
+    sscanf(timeStr, " %d", &hour); // 첫 숫자만 추출
+    return hour;
+}
+
 // --------------
-// 활용 기능 함수
+// 활용 기능 함수 (중기능)
 // --------------
 
 // 로그인 함수
@@ -797,23 +820,6 @@ void handleAddFriendScreen(const char* userName, const char* userID)
     SetConsoleMode(hInput, prevMode);
 }
 
-int getDayIndex(const char* day)
-{
-    if (strstr(day, "월")) return 0;
-    if (strstr(day, "화")) return 1;
-    if (strstr(day, "수")) return 2;
-    if (strstr(day, "목")) return 3;
-    if (strstr(day, "금")) return 4;
-    return -1;
-}
-
-int getStartHour(const char* timeStr)
-{
-    int hour = 0;
-    sscanf(timeStr, " %d", &hour); // 첫 숫자만 추출
-    return hour;
-}
-
 // 시간표 함수
 void handleTimetableScreen(const char* userID)
 {
@@ -1019,6 +1025,7 @@ void handleTimetableScreen(const char* userID)
     }
 }
 
+// 강의 목록 함수
 void handleSubjectList(const char* userID)
 {
     system("cls");
