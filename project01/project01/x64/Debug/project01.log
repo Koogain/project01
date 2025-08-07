@@ -1,10 +1,10 @@
 ﻿  main.c
-C:\Users\Koomy\source\repos\project01\project01\main.c(180,30): warning C4028: 정식 매개 변수 1이(가) 선언과 다릅니다.
-C:\Users\Koomy\source\repos\project01\project01\main.c(180,46): warning C4028: 정식 매개 변수 2이(가) 선언과 다릅니다.
-C:\Users\Koomy\source\repos\project01\project01\main.c(180,60): warning C4028: 정식 매개 변수 3이(가) 선언과 다릅니다.
-C:\Users\Koomy\source\repos\project01\project01\main.c(291,6): warning C4026: 정식 매개 변수 목록을 사용하여 함수를 선언했습니다.
-C:\Users\Koomy\source\repos\project01\project01\main.c(529,39): warning C4090: '함수': 다른 'const' 한정자
-C:\Users\Koomy\source\repos\project01\project01\main.c(529,49): warning C4090: '함수': 다른 'const' 한정자
-C:\Users\Koomy\source\repos\project01\project01\main.c(529,57): warning C4090: '함수': 다른 'const' 한정자
-C:\Users\Koomy\source\repos\project01\project01\main.c(113,1): warning C4716: 'getRandomColor': 값을 반환해야 합니다.
+C:\Users\Koomy\source\repos\project01\project01\main.c(207,30): warning C4028: 정식 매개 변수 1이(가) 선언과 다릅니다.
+C:\Users\Koomy\source\repos\project01\project01\main.c(207,46): warning C4028: 정식 매개 변수 2이(가) 선언과 다릅니다.
+C:\Users\Koomy\source\repos\project01\project01\main.c(207,60): warning C4028: 정식 매개 변수 3이(가) 선언과 다릅니다.
+C:\Users\Koomy\source\repos\project01\project01\main.c(348,6): warning C4026: 정식 매개 변수 목록을 사용하여 함수를 선언했습니다.
+C:\Users\Koomy\source\repos\project01\project01\main.c(632,39): warning C4090: '함수': 다른 'const' 한정자
+C:\Users\Koomy\source\repos\project01\project01\main.c(632,49): warning C4090: '함수': 다른 'const' 한정자
+C:\Users\Koomy\source\repos\project01\project01\main.c(632,57): warning C4090: '함수': 다른 'const' 한정자
+C:\Users\Koomy\source\repos\project01\project01\main.c(117,1): warning C4716: 'getRandomColor': 값을 반환해야 합니다.
   project01.vcxproj -> C:\Users\Koomy\source\repos\project01\x64\Debug\project01.exe

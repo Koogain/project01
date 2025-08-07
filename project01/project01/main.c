@@ -48,6 +48,10 @@ void handleSubjectList(const char* userID);
 void handleFriendsListScreen(const char* userName, const char* userID, const char* userPW);
 void handleAddFriendScreen(const char* userName, const char* userID);
 
+void handleFriendPin();
+
+// 15 : 하얀색, 13 : 밝은 자주색
+
 // 전역 변수
 char userName[50] = { 0 };
 char userID[50] = { 0 };
@@ -232,12 +236,42 @@ void handleLoginScreen(char* userName, char* userID, char* userPW)
         if (record.EventType == MOUSE_EVENT)
         {
             MOUSE_EVENT_RECORD mouse = record.Event.MouseEvent;
+            int clickX = mouse.dwMousePosition.X;
+            int clickY = mouse.dwMousePosition.Y;
 
+            // 커서가 위치할 때
+            if (mouse.dwEventFlags == MOUSE_MOVED)
+            {
+                // 로그인 커서
+                if (isInside(clickX, clickY, 33, 24, 44, 24))
+                {
+                    setColor(13);
+                    gotoxy(33, 24); printf("[  로그인  ]");
+                }
+                else
+                {
+                    setColor(15); // 흰색
+                    gotoxy(33, 24); printf("[  로그인  ]");
+                }
+
+                // 회원가입 커서
+                if (isInside(clickX, clickY, 50, 24, 61, 24))
+                {
+                    setColor(13);
+                    gotoxy(50, 24); printf("[ 회원가입 ]");
+                }
+                else
+                {
+                    setColor(15);
+                    gotoxy(50, 24); printf("[ 회원가입 ]");
+                }
+
+                setColor(15); // 기본 색상 복원
+            }
+
+            // 클릭을 했을 때
             if ((mouse.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) && mouse.dwEventFlags == 0)
             {
-                int clickX = mouse.dwMousePosition.X;
-                int clickY = mouse.dwMousePosition.Y;
-
                 // [회원가입] 버튼 
                 if (isInside(clickX, clickY, 50, 24, 61, 24))
                 {
@@ -357,21 +391,20 @@ void handleSignupScreen()
                 // 확인 버튼 hover
                 if (isInside(clickX, clickY, 33, 30, 41, 30))
                 {
-                    setColor(10); // 초록색
+                    setColor(13);
                     gotoxy(33, 30); printf("[  확인  ]");
                 }
                 else
                 {
-                    setColor(15); // 흰색
+                    setColor(15); 
                     gotoxy(33, 30); printf("[  확인  ]");
                 }
 
                 // 로그인 화면 버튼 hover
                 if (isInside(clickX, clickY, 50, 30, 65, 30))
                 {
-                    setColor(10);
+                    setColor(13);
                     gotoxy(50, 30); printf("[ 로그인 화면 ]");
-                    return;
                 }
                 else
                 {
@@ -511,11 +544,12 @@ void handleMainMenuScreen(const char* userID, const char* userName, const char* 
     printf("환영합니다!");
 
     drawBox(27, 9, 30, 3);
-    drawBox(27, 13, 30, 3);
-    drawBox(27, 17, 30, 3);
-
     gotoxy(29, 10);  printf("1. 나의 시간표 보기 ");
+
+    drawBox(27, 13, 30, 3);
     gotoxy(29, 14);  printf("2. 친구 목록 보기 ");
+
+    drawBox(27, 17, 30, 3);
     gotoxy(29, 18);  printf("3. 로그아웃 ");
 
     HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
@@ -523,31 +557,77 @@ void handleMainMenuScreen(const char* userID, const char* userName, const char* 
     GetConsoleMode(hInput, &prevMode);
     SetConsoleMode(hInput, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
 
-    INPUT_RECORD inputRecord;
+    INPUT_RECORD record;
     DWORD events;
 
     while (1)
     {
-        ReadConsoleInput(hInput, &inputRecord, 1, &events);
+        ReadConsoleInput(hInput, &record, 1, &events);
 
-        if (inputRecord.EventType == MOUSE_EVENT)
+        if (record.EventType == MOUSE_EVENT)
         {
-            MOUSE_EVENT_RECORD m = inputRecord.Event.MouseEvent;
+            MOUSE_EVENT_RECORD mouse = record.Event.MouseEvent;
+            int clickX = mouse.dwMousePosition.X;
+            int clickY = mouse.dwMousePosition.Y;
 
-            if (m.dwEventFlags == 0 && (m.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED))
+            if (mouse.dwEventFlags == MOUSE_MOVED)
             {
-                int x = m.dwMousePosition.X;
-                int y = m.dwMousePosition.Y;
+                // 나의 시간표 보기
+                if (isInside(clickX, clickY, 27, 9, 56, 11))
+                {
+                    setColor(13);
+                    drawBox(27, 9, 30, 3);
+                    gotoxy(29, 10);  printf("1. 나의 시간표 보기 ");
+                }
+                else
+                {
+                    setColor(15);
+                    drawBox(27, 9, 30, 3);
+                    gotoxy(29, 10);  printf("1. 나의 시간표 보기 ");
+                }
 
-                if (x >= 29 && x <= 57 && y >= 9 && y <= 11)
+                // 친구 목록 보기
+                if (isInside(clickX, clickY, 27, 13, 56, 15))
+                {
+                    setColor(13);
+                    drawBox(27, 13, 30, 3);
+                    gotoxy(29, 14);  printf("2. 친구 목록 보기 ");
+                }
+                else
+                {
+                    setColor(15);
+                    drawBox(27, 13, 30, 3);
+                    gotoxy(29, 14);  printf("2. 친구 목록 보기 ");
+                }
+
+                // 로그아웃
+                if (isInside(clickX, clickY, 27, 17, 56, 19))
+                {
+                    setColor(13);
+                    drawBox(27, 17, 30, 3);
+                    gotoxy(29, 18);  printf("3. 로그아웃 ");
+                }
+                else
+                {
+                    setColor(15);
+                    drawBox(27, 17, 30, 3);
+                    gotoxy(29, 18);  printf("3. 로그아웃 ");
+                }
+
+                setColor(15); // 기본 색상 복원
+            }
+
+            if (mouse.dwEventFlags == 0 && (mouse.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED))
+            {
+                if (isInside(clickX, clickY, 27, 9, 56, 11))  
                 {
                     handleTimetableScreen(userID);
                 }
-                else if (x >= 29 && x <= 57 && y >= 13 && y <= 15)
+                else if (isInside(clickX, clickY, 27, 13, 56, 15))  
                 {
                     handleFriendsListScreen(userName, userID, userPW);
                 }
-                else if (x >= 29 && x <= 57 && y >= 17 && y <= 19)
+                else if (isInside(clickX, clickY, 27, 17, 56, 19)) 
                 {
                     handleLoginScreen(userName, userID, userPW);
                     break;
@@ -610,41 +690,53 @@ void handleFriendsListScreen(const char* userID, const char* userName, const cha
     // 버튼 표시
     gotoxy(27, 30);
     printf("[ 친구 추가 ]");
-    gotoxy(43, 30);
+    /*
+    gotoxy(40, 30);
+    printf("[ 즐겨찾기 ]")
+    */
+    gotoxy(53, 30);
     printf("[ 뒤로가기 ]");
 
-    // 마우스 이벤트 처리
     HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
     DWORD prevMode;
     GetConsoleMode(hInput, &prevMode);
     SetConsoleMode(hInput, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
 
-    INPUT_RECORD inputRecord;
+    INPUT_RECORD record;
     DWORD events;
 
     while (1)
     {
-        ReadConsoleInput(hInput, &inputRecord, 1, &events);
+        ReadConsoleInput(hInput, &record, 1, &events);
 
-        if (inputRecord.EventType == MOUSE_EVENT)
+        if (record.EventType == MOUSE_EVENT)
         {
-            MOUSE_EVENT_RECORD m = inputRecord.Event.MouseEvent;
+            MOUSE_EVENT_RECORD m = record.Event.MouseEvent;
 
             if (m.dwEventFlags == 0 && (m.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED))
             {
-                int x = m.dwMousePosition.X;
-                int y = m.dwMousePosition.Y;
+                MOUSE_EVENT_RECORD mouse = record.Event.MouseEvent;
+                int clickX = mouse.dwMousePosition.X;
+                int clickY = mouse.dwMousePosition.Y;
 
-                // [친구 추가] 클릭
-                if (x >= 27 && x <= 38 && y == 30)
+                // [ 친구 추가 ] 클릭
+                if (isInside(clickX, clickY, 27, 30, 38, 30))
                 {
                     handleAddFriendScreen(userName, userID);
                     system("cls");
                     handleFriendsListScreen(userID, userName, userPW);
                     break;
                 }
-                // [뒤로가기] 클릭
-                else if (x >= 43 && x <= 53 && y == 30)
+                // [ 즐겨찾기 ] 클릭
+                /*
+                else if (isInside(clickX, clickY, 40, 30, 50, 30))
+                {
+                    handleFriendPin();
+                    break;
+                }
+                */
+                // [ 뒤로가기 ] 클릭
+                else if (isInside(clickX, clickY, 53, 30, 63, 30))
                 {
                     handleMainMenuScreen(userID, userName, userPW);
                     break;
@@ -1152,5 +1244,9 @@ void handleSubjectList(const char* userID)
     SetConsoleMode(hInput, prevMode);
 }
 
+// 즐겨찾기 함수
+void handleFriendPin()
+{
 
+}
 
